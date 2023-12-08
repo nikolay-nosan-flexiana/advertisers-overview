@@ -1,0 +1,11 @@
+{:deps true
+ 
+ :nrepl {:port 8777}
+
+ :builds {
+          :app {:target :browser
+                :modules {:main {:init-fn ads.core/run}}
+                :compiler-options {:closure-defines {re-frame.trace.trace-enabled? true}}
+                :devtools {:http-root "public"
+                           :http-port 8000
+                           :preloads [devtools.preload day8.re-frame-10x.preload]}}}}
