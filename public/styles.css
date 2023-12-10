@@ -70,3 +70,7 @@ body {
     border-style: none;
     border-color: #666666 !important;
 }
+
+.MuiDataGrid-row:hover {
+    background-color: #454545;
+}

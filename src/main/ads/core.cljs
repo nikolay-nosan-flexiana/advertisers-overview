@@ -19,7 +19,7 @@
   (rfe/start!
    router/router
    on-navigate
-   {:use-fragment true}))
+   {:use-fragment false}))
 
 (defn mount-ui
   []

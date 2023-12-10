@@ -27,32 +27,30 @@
            :advertisers-stats stats)
     db))
 
-(rf/reg-fx
- :navigate!
- (fn [k params query]
-   (rfe/push-state k params query)))
+(rf/reg-event-fx
+ :navigate-to
+ (fn [_ [_ name query]]
+   (rfe/push-state name [] query)))
+
+(defn set-sort-params-if-presented
+  [route db]
+  (let [sort-field (-> route :query-params :sort)
+        sort-type (-> route :query-params :sortType)]
+    (if (and sort-field sort-type)
+      (assoc db :sort-params [sort-field sort-type])
+      db)))
 
 (rf/reg-event-db
  :navigated
- (fn [db [_ new-match]]
-   (assoc db :current-route new-match)))
-
-(rf/reg-event-db
- :set-error
- (fn [db [_ value]]
-   (assoc db :error-message value)))
+ (fn [db [_ route]]
+   (->> route
+        (assoc db :current-route)
+        (set-sort-params-if-presented route))))
 
 (rf/reg-event-db
  :set-sort-params
- (fn [db [_ value]]
-   (let [sort-params [(get value "sort") (get value "type")]]
-   (assoc db :sort-params sort-params))))
-
-
-(rf/reg-event-db
- :set-in-progress
- (fn [db [_ value]]
-   (assoc db :in-progress value)))
+ (fn [db [_ sort-params]]
+   (assoc db :sort-params sort-params)))
 
 (rf/reg-event-db
  :on-http-error

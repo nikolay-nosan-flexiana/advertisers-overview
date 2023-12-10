@@ -28,14 +28,21 @@
         in-progress @(rf/subscribe [:get-in-progress])
         rows-data (or advertisers [])
         [sort-field sort-type] @(rf/subscribe [:get-sort-params])]
-  [:div {:style {:height 500} }
+  [:div {:style {:height 500}}
    [:div {:style {:color "#FF0000"}} (or error "")]
     [:> DataGrid {:rows rows-data
                   :columns (concat base-columns stats-columns)
                   :hideFooter true
                   :disableColumnMenu true
                   :loading in-progress
-                  :initialState {:sorting {:sortModel [{:field sort-field, :sort sort-type}]}}
+                  :onSortModelChange (fn [sort-params _]
+                                       (let [sp (js->clj sort-params)
+                                             sort-field (-> sp first (get "field"))
+                                             sort-type (-> sp first (get "sort"))
+                                             params {:sort sort-field :sortType sort-type}]
+                                       (when sort-field
+                                         (rf/dispatch [:navigate-to :advertisers params]))))
+                  :sortModel [{:field sort-field, :sort sort-type}]
                   :sx {:border 1
                        :borderColor "#999999"
                        :borderRadius 0
@@ -44,5 +51,5 @@
 (defn advertisers-ui
   []
     [:div {:class-name "main-container"}
-     [:div {:class-name "page-header"} "Overview of Advertisers" ]
+     [:div {:class-name "page-header"} "Overview of Advertisers"]
      [ads-table]])
